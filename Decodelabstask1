@@ -1,0 +1,19 @@
+! pip install numpy
+! pip install pandas
+import numpy as np
+import pandas as pd
+from google.colab import drive
+drive.mount('/content/drive')
+a=pd.read_csv("/content/drive/MyDrive/decodelabsproject.csv")
+print(a)
+a.head()
+a.tail()
+a.describe()
+a.info()
+a.shape
+a.isnull()
+a.isnull().sum()
+a.columns
+a.dropna()
+a.fillna(0, inplace=True)
+print(a.isnull().sum())
