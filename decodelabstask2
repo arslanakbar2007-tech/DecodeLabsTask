@@ -1,0 +1,137 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+uploaded = files.upload()
+df = pd.read_csv("decodelabsproject.csv")
+df.head()
+print("Shape:", df.shape)
+print("\nColumns:")
+print(df.columns)
+print("\nData Types:")
+print(df.dtypes)
+print("\nMissing Values:")
+print(df.isnull().sum())
+df.describe()
+# Check missing values
+missing_values = df.isnull().sum()
+print("Missing Values in Each Column:")
+print(missing_values)
+numeric_columns = df.select_dtypes(include=np.number).columns
+for column in numeric_columns:
+    df[column] = df[column].fillna(df[column].median())
+print("Missing values after cleaning:")
+print(df.isnull().sum())
+print("Number of duplicate rows:", df.duplicated().sum())
+df = df.drop_duplicates()
+print("Shape after removing duplicates:", df.shape)
+print(df.dtypes)
+print(df.dtypes)
+df.head(10)
+df.to_csv("cleaned_student_performance.csv", index=False)
+print("Cleaned dataset saved successfully!")
+df["Gender"].value_counts()
+df["Gender"].value_counts().plot(kind="bar")
+plt.title("Gender Distribution")
+plt.xlabel("Gender")
+plt.ylabel("Number of Students")
+plt.show()
+plt.scatter(df["Study_Hours"], df["Final_Score"])
+plt.title("Study Hours vs Final Score")
+plt.xlabel("Study Hours")
+plt.ylabel("Final Score")
+plt.show()
+plt.scatter(df["Attendance_Percentage"], df["Final_Score"])
+plt.title("Attendance vs Final Score")
+plt.xlabel("Attendance Percentage")
+plt.ylabel("Final Score")
+plt.show()
+plt.scatter(df["Previous_Score"], df["Final_Score"])
+plt.title("Previous Score vs Final Score")
+plt.xlabel("Previous Score")
+plt.ylabel("Final Score")
+plt.show()
+plt.hist(df["Final_Score"], bins=10)
+plt.title("Final Score Distribution")
+plt.xlabel("Final Score")
+plt.ylabel("Number of Students")
+plt.show()
+correlation = df.select_dtypes(include=np.number).corr()
+correlation
+final_score_correlation = correlation["Final_Score"].sort_values(ascending=False)
+print("Correlation with Final Score:")
+print(final_score_correlation)
+plt.figure(figsize=(10, 7))
+plt.imshow(correlation, cmap="coolwarm", aspect="auto")
+plt.colorbar()
+plt.xticks(
+    range(len(correlation.columns)),
+    correlation.columns,
+    rotation=45,
+    ha="right"
+)
+plt.yticks(
+    range(len(correlation.columns)),
+    correlation.columns
+)
+plt.title("Correlation Heatmap")
+plt.tight_layout()
+plt.show()
+factors = final_score_correlation.drop("Final_Score")
+print("Factors correlated with Final Score:")
+print(factors)
+gender_performance = df.groupby("Gender")["Final_Score"].mean()
+print(gender_performance)
+gender_performance.plot(kind="bar")
+plt.title("Average Final Score by Gender")
+plt.xlabel("Gender")
+plt.ylabel("Average Final Score")
+plt.show()
+def performance_category(score):
+    if score >= 80:
+        return "Excellent"
+    elif score >= 70:
+        return "Good"
+    elif score >= 60:
+        return "Average"
+    else:
+        return "Needs Improvement"
+df["Performance_Category"] = df["Final_Score"].apply(performance_category)
+df[["Student_ID", "Final_Score", "Performance_Category"]].head(10)
+category_counts = df["Performance_Category"].value_counts()
+print(category_counts)
+category_counts.plot(kind="bar")
+plt.title("Student Performance Categories")
+plt.xlabel("Performance Category")
+plt.ylabel("Number of Students")
+plt.xticks(rotation=0)
+plt.show()
+study_performance = df.groupby("Performance_Category")["Study_Hours"].mean()
+print(study_performance)
+study_performance.plot(kind="bar")
+plt.title("Average Study Hours by Performance Category")
+plt.xlabel("Performance Category")
+plt.ylabel("Average Study Hours")
+plt.xticks(rotation=0)
+plt.show()
+attendance_performance = df.groupby("Performance_Category")["Attendance_Percentage"].mean()
+print(attendance_performance)
+attendance_performance.plot(kind="bar")
+plt.title("Average Attendance by Performance Category")
+plt.xlabel("Performance Category")
+plt.ylabel("Average Attendance (%)")
+plt.xticks(rotation=0)
+plt.show()
+top_students = df.sort_values(
+    by="Final_Score",
+    ascending=False
+).head(10)
+
+top_students[
+    ["Student_ID", "Gender", "Study_Hours",
+     "Attendance_Percentage", "Final_Score"]
+]
+print("Final Dataset Shape:", df.shape)
+df.head()
+df.to_csv("final_student_performance_analysis.csv", index=False)
+print("Final dataset exported successfully!")
